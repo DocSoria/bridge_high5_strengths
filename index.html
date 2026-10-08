@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>Strengths Leave Clues | Bridge</title>
+<style>
+:root{
+  --ink:#191919;
+  --muted:#4d4d4d;
+  --silver:#808080;
+  --silver-light:#f1f1f1;
+  --silver-mid:#d7d7d7;
+  --paper:#ffffff;
+  --paper2:#fafafa;
+  --line:#b9b9b9;
+  --palouse:#034441;
+  --bark:#552301;
+  --huckleberry:#261882;
+  --white:#ffffff;
+  --focus:#261882;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"Public Sans", Arial, Helvetica, sans-serif;
+  color:var(--ink);
+  background:linear-gradient(180deg,#eeeeee,#f7f7f7 28rem,#e9e9e9);
+  line-height:1.6;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+.wrap{width:min(1080px,calc(100% - 32px));margin:auto}
+.hero{padding:56px 0 34px}
+.eyebrow{
+  font-family:"Public Sans",Arial,sans-serif;
+  font-size:.8rem;
+  letter-spacing:.13em;
+  text-transform:uppercase;
+  color:var(--bark);
+  font-weight:800;
+  margin-bottom:10px;
+}
+.hero-grid{display:block}
+h1{
+  font-size:clamp(2.35rem,7vw,4.7rem);
+  line-height:1;
+  margin:.1em 0 .28em;
+  letter-spacing:-.035em;
+  font-weight:900;
+  color:var(--palouse)
+}
+.hero p{font-size:1.16rem;max-width:720px}
+.note{
+  margin:28px 0 0;
+  padding:17px 19px;
+  border-left:5px solid var(--huckleberry);
+  background:#ffffff;
+  max-width:800px
+}
+.section{padding:32px 0}
+.panel{
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 10px 24px rgba(25,25,25,.10);
+  overflow:hidden
+}
+.panel-head{
+  padding:22px 24px;
+  border-bottom:4px solid var(--palouse);
+  display:flex;
+  gap:14px;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--silver-light);
+}
+.panel-body{padding:24px}
+.case-label{
+  font-family:"Public Sans",Arial,sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.11em;
+  color:var(--bark);
+  font-size:.78rem;
+  font-weight:800
+}
+.progress{height:9px;background:var(--silver-mid);border-radius:999px;overflow:hidden;margin:10px 0 0}
+.progress > div{height:100%;background:var(--palouse);width:25%;transition:width .25s ease}
+.scenario-title{font-size:clamp(1.5rem,4vw,2.25rem);margin:.15em 0 .35em}
+.scenario-text{font-size:1.08rem;max-width:820px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}
+.choice{
+  text-align:left;
+  padding:18px;
+  border:2px solid var(--silver-mid);
+  border-radius:12px;
+  background:#ffffff;
+  min-height:110px;
+  display:flex;
+  gap:13px;
+  align-items:flex-start;
+  transition:.15s transform,.15s border-color,.15s background
+}
+.choice:hover{transform:translateY(-2px);border-color:var(--huckleberry);background:#f7f7fb}
+.choice.selected{border:3px solid var(--palouse);background:#f0f6f5}
+.choice-letter{
+  flex:0 0 36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--huckleberry);
+  color:#ffffff;
+  font-family:"Public Sans",Arial,sans-serif;
+  font-weight:800
+}
+.actionbar{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:22px;flex-wrap:wrap}
+.primary,.secondary{background:#ffffff;color:var(--huckleberry);border-color:var(--huckleberry)}
+.primary{background:var(--palouse);color:#ffffff}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.secondary{background:#ffffff;color:var(--huckleberry);border-color:var(--huckleberry)}
+.reveal{
+  display:none;
+  margin-top:22px;
+  border:2px solid var(--bark);
+  background:#fbf8f6;
+  border-radius:14px;
+  padding:20px
+}
+.reveal.show{display:block}
+.reveal h3{margin:0 0 6px;font-size:1.35rem}
+.clue-tag{
+  display:inline-block;
+  background:var(--palouse);
+  color:#ffffff;
+  border-radius:999px;
+  padding:6px 11px;
+  font-family:"Public Sans",Arial,sans-serif;
+  font-size:.82rem;
+  font-weight:800;
+  margin-bottom:10px
+}
+.caution{font-size:.93rem;color:var(--muted);border-top:1px solid var(--line);padding-top:12px;margin-top:14px}
+.casefile{display:none}
+.casefile.show{display:block}
+.evidence-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px}
+.evidence{background:#ffffff;border:1px solid var(--line);border-top:5px solid var(--palouse);border-radius:12px;padding:15px}
+.evidence strong{display:block;margin-bottom:4px}
+.reflection{
+  margin-top:22px;
+  padding:20px;
+  border:1px solid var(--line);
+  border-left:6px solid var(--huckleberry);
+  border-radius:12px;
+  background:#ffffff
+}
+label{font-weight:700;display:block;margin-bottom:7px}
+textarea{width:100%;min-height:120px;padding:13px;border:1px solid #bfb29f;border-radius:10px;background:white;color:var(--ink);resize:vertical}
+.prompt-card{
+  margin-top:18px;
+  background:var(--huckleberry);
+  color:#ffffff;
+  padding:20px;
+  border-radius:14px;
+  border-top:6px solid var(--silver)
+}
+.prompt-card h3{margin-top:0}
+.prompt{background:rgba(255,255,255,.07);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,.15);font-family:Arial,sans-serif;font-size:.95rem}
+.footer{padding:30px 0 48px;color:var(--muted);font-size:.93rem}
+.small{font-family:Arial,sans-serif;font-size:.88rem;color:var(--muted)}
+.hidden{display:none!important}
+
+.casefile .panel{
+  background:#ffffff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  box-shadow:0 10px 24px rgba(25,25,25,.10);
+  overflow:hidden
+}
+.casefile .panel:before{
+  content:"CONFIDENTIAL";
+  position:absolute; right:20px; top:82px;
+  transform:rotate(-8deg);
+  border:3px double rgba(85,35,1,.34);
+  color:rgba(85,35,1,.34);
+  padding:6px 10px;
+  font-family:Arial,sans-serif;
+  font-weight:800;
+  letter-spacing:.12em;
+  pointer-events:none
+}
+.choice:last-child{border-color:var(--silver);background:#f5f5f5}
+.choice:last-child .choice-letter{background:var(--silver);color:#000000}
+.case-number{
+  display:inline-block;
+  padding:5px 9px;
+  border:2px solid var(--bark);
+  background:#ffffff;
+  color:var(--bark);
+  font-family:"Courier New",monospace;
+  font-weight:700;
+  letter-spacing:.06em
+}
+
+
+.choice.selected .choice-letter{
+  flex:0 0 36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:var(--huckleberry);
+  color:#ffffff;
+  font-family:"Public Sans",Arial,sans-serif;
+  font-weight:800
+}
+.primary:hover{background:var(--bark)}
+.secondary:hover{border-color:var(--huckleberry);background:#f2f0fb}
+.case-number{
+  display:inline-block;
+  padding:5px 9px;
+  border:2px solid var(--bark);
+  background:#ffffff;
+  color:var(--bark);
+  font-family:"Courier New",monospace;
+  font-weight:700;
+  letter-spacing:.06em
+}
+.prompt-card{
+  margin-top:18px;
+  background:var(--huckleberry);
+  color:#ffffff;
+  padding:20px;
+  border-radius:14px;
+  border-top:6px solid var(--silver)
+}
+
+
+.evidence:nth-child(2n){border-top-color:var(--huckleberry)}
+.evidence:nth-child(3n){border-top-color:var(--bark)}
+.reflection{
+  margin-top:22px;
+  padding:20px;
+  border:1px solid var(--line);
+  border-left:6px solid var(--huckleberry);
+  border-radius:12px;
+  background:#ffffff
+}
+.footer strong{color:var(--palouse)}
+
+
+.panel-head{
+  padding:22px 24px;
+  border-bottom:4px solid var(--palouse);
+  display:flex;
+  gap:14px;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--silver-light);
+}
+
+
+button, textarea, input { font-family:"Public Sans", Arial, Helvetica, sans-serif; }
+button{min-height:44px}
+button:focus-visible,
+textarea:focus-visible,
+input:focus-visible{
+  outline:4px solid var(--huckleberry);
+  outline-offset:3px;
+}
+.choice:focus-visible{
+  outline:4px solid var(--huckleberry);
+  outline-offset:3px;
+}
+textarea{
+  border:2px solid var(--silver);
+  background:#ffffff;
+  color:#191919;
+}
+.small{color:#4d4d4d}
+.caution{color:#3f3f3f}
+::selection{background:var(--palouse);color:#ffffff}
+
+@media(max-width:760px){
+  .choices,.evidence-grid{grid-template-columns:1fr}
+  .panel-head{
+  padding:22px 24px;
+  border-bottom:4px solid var(--palouse);
+  display:flex;
+  gap:14px;
+  justify-content:space-between;
+  align-items:center;
+  background:var(--silver-light);
+}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+@media print{
+  body{background:white}.hero,.panel:not(.casefile),.footer,.actionbar,.prompt-card{
+  margin-top:18px;
+  background:var(--huckleberry);
+  color:#ffffff;
+  padding:20px;
+  border-radius:14px;
+  border-top:6px solid var(--silver)
+}
+  .casefile{display:block!important;border:none;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<header class="hero">
+<div class="wrap hero-grid">
+<div>
+<div class="eyebrow">Bridge • Strengths Discovery</div>
+<h1>Strengths Leave Clues.</h1>
+<p>Your natural responses to everyday situations can reveal patterns in how you think, work, relate, and contribute. Your assignment: Examine the evidence.</p>
+</div>
+</div>
+
+</header>
+<main class="wrap">
+<section class="section" id="game">
+<div class="panel">
+<div class="panel-head">
+<div>
+<div class="case-label"><span class="case-number" id="caseLabel">Evidence File 01 / 04</span></div>
+<div aria-label="Case progress" class="progress"><div id="progressBar"></div></div>
+</div>
+<button class="secondary" id="restart" type="button">Restart investigation</button>
+</div>
+<div class="panel-body">
+<div class="case-label">The situation</div>
+<h2 class="scenario-title" id="scenarioTitle"></h2>
+<p class="scenario-text" id="scenarioText"></p>
+<div aria-label="Response choices" class="choices" id="choices" role="group"></div>
+<div aria-live="polite" class="reveal" id="reveal">
+<div class="clue-tag">Possible clue discovered</div>
+<h3 id="clueTitle"></h3>
+<p id="clueText"></p>
+<div class="caution"><strong>Important:</strong> One response does not identify a strength. We are looking for recurring patterns—responses that feel natural, energizing, and familiar across situations.</div>
+</div>
+<div class="actionbar">
+<span class="small" id="status">Select the response that feels most natural.</span>
+<button class="primary" disabled="" id="next" type="button">Examine this clue</button>
+</div>
+</div>
+</div>
+</section>
+<section class="section casefile" id="casefile">
+<div class="panel">
+<div class="panel-head">
+<div>
+<div class="case-label">Investigator’s case file</div>
+<h2 style="margin:.2em 0 0">What patterns did you notice?</h2>
+</div>
+<button class="secondary" onclick="window.print()" type="button">Print case file</button>
+</div>
+<div class="panel-body">
+<p>These are not assessment results. They are pieces of evidence you can compare with your HIGH5 results and your own experiences.</p>
+<div class="evidence-grid" id="evidenceGrid"></div>
+<div class="reflection">
+<label for="notes">Detective’s notes: Where have you seen one of these patterns before?</label>
+<textarea id="notes" placeholder="Think about work, learning, relationships, volunteering, hobbies, or another part of your life..."></textarea>
+</div>
+<div class="prompt-card">
+<div class="case-label" style="color:#FFFFFF">Optional AI fieldwork</div>
+<h3>Take the investigation one step further.</h3>
+<p>Paste this prompt into an approved AI tool and replace the bracketed text with one of your HIGH5 strengths:</p>
+<div class="prompt">One of my HIGH5 strengths is [STRENGTH]. Act as a reflective coach, not an evaluator. Ask me five questions, one at a time, to help me identify specific moments when this strength may have shown up in my work or life. Do not tell me whether I have the strength; help me examine my own evidence.</div>
+</div>
+<div class="actionbar">
+<span class="small">Case status: Evidence collected. Your HIGH5 assessment provides the next piece of the investigation.</span>
+<button class="primary" id="again" type="button">Investigate again</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer">
+<div class="wrap">
+<strong>Strengths Leave Clues</strong> • Bridge strengths-discovery learning activity • University of Idaho
+    <div style="margin-top:6px">Scenario responses are reflection prompts, not diagnostic indicators. Different strengths can lead to similar behaviors, and context matters.</div>
+</div>
+</footer>
+<script>
+const cases = [
+  {
+    title:"A colleague needs you at the worst possible time.",
+    text:"It is late in the day. You are trying to finish an important task before a deadline when a colleague comes to you visibly upset and asks if you have a minute. What are you most naturally inclined to do first?",
+    options:[
+      {text:"Pause my work and give them my full attention.", tag:"People first", clue:"Your attention may naturally move toward what another person is feeling and what they need in the moment.", strengths:"Possible connections: Empathizer, Coach"},
+      {text:"Tell them I want to help, finish the urgent task, and then circle back.", tag:"Commitment first", clue:"You may naturally organize competing demands around commitments, sequence, and follow-through.", strengths:"Possible connections: Deliverer, Time Keeper, Focus Expert"},
+      {text:"Listen, then help them map out possible options and next steps.", tag:"Find a path", clue:"Your mind may naturally begin organizing the situation into possibilities, patterns, or workable solutions.", strengths:"Possible connections: Strategist, Problem Solver"},
+      {text:"Help them regain perspective and confidence that they can get through it.", tag:"Restore momentum", clue:"You may naturally bring encouragement, energy, and a sense of possibility when someone is discouraged.", strengths:"Possible connections: Optimist, Coach"},
+      {text:"None of these feels natural to me.", tag:"No clear clue in this case", clue:"That is useful evidence too. This particular situation may not reveal much about your natural patterns, or your instinctive response may be something not listed here.", strengths:"No strength connection assigned—continue to the next case."}
+    ]
+  },
+  {
+    title:"The team project has stalled.",
+    text:"A shared project has lost momentum. People are frustrated, the next steps are unclear, and the deadline is approaching. What would you instinctively want to do?",
+    options:[
+      {text:"Step in, clarify decisions, and get everyone moving.", tag:"Create direction", clue:"You may be comfortable creating clarity and momentum when a group is hesitant or stuck.", strengths:"Possible connections: Commander, Catalyst"},
+      {text:"Figure out exactly what is causing the problem before changing anything.", tag:"Diagnose first", clue:"You may naturally investigate causes, examine evidence, and work toward a precise understanding of the problem.", strengths:"Possible connections: Analyst, Problem Solver"},
+      {text:"Generate several fresh approaches the team has not tried yet.", tag:"Open possibilities", clue:"You may naturally respond to stuckness by creating ideas, alternatives, and new combinations.", strengths:"Possible connections: Brainstormer, Strategist"},
+      {text:"Check in with the people involved and help restore trust and energy.", tag:"Reconnect the team", clue:"You may naturally notice the relational side of stalled work and invest in people before pushing the task forward.", strengths:"Possible connections: Coach, Peace Keeper, Empathizer"},
+      {text:"None of these feels natural to me.", tag:"No clear clue in this case", clue:"That is useful evidence too. This particular situation may not reveal much about your natural patterns, or your instinctive response may be something not listed here.", strengths:"No strength connection assigned—continue to the next case."}
+    ]
+  },
+  {
+    title:"A new employee seems unsure of where they fit.",
+    text:"Someone new joins your unit. They are capable, but they seem hesitant and unsure about how things work. Nobody has formally asked you to help. What are you most likely to do?",
+    options:[
+      {text:"Notice how they are feeling and make a point of helping them feel welcome.", tag:"Notice the person", clue:"You may naturally pick up on emotional and interpersonal cues that others miss.", strengths:"Possible connections: Empathizer, Peace Keeper"},
+      {text:"Offer to show them the ropes and help them build confidence.", tag:"Develop potential", clue:"You may naturally see opportunities to help another person learn, grow, and become more confident.", strengths:"Possible connections: Coach"},
+      {text:"Explain how things work with examples, stories, and context.", tag:"Make it memorable", clue:"You may naturally use communication and narrative to make information easier for others to understand.", strengths:"Possible connections: Storyteller"},
+      {text:"Watch what they seem to need and adjust my approach to match.", tag:"Adapt in real time", clue:"You may naturally adjust to changing people and circumstances instead of relying on one fixed approach.", strengths:"Possible connections: Chameleon"},
+      {text:"None of these feels natural to me.", tag:"No clear clue in this case", clue:"That is useful evidence too. This particular situation may not reveal much about your natural patterns, or your instinctive response may be something not listed here.", strengths:"No strength connection assigned—continue to the next case."}
+    ]
+  },
+  {
+    title:"A major change is announced with incomplete information.",
+    text:"Your unit learns that an important process will change next month. Details are still emerging, and people have mixed reactions. What does your mind tend to do first?",
+    options:[
+      {text:"Think several steps ahead about what the change could mean.", tag:"Look ahead", clue:"You may naturally explore future implications, pathways, and possibilities before others do.", strengths:"Possible connections: Strategist, Thinker"},
+      {text:"Look for more information and evidence before deciding what I think.", tag:"Examine the facts", clue:"You may naturally seek clarity, logic, and evidence before forming a conclusion.", strengths:"Possible connections: Analyst, Thinker"},
+      {text:"Start adjusting and figure it out as the situation develops.", tag:"Move with change", clue:"You may naturally stay flexible and respond to what the situation requires in real time.", strengths:"Possible connections: Chameleon"},
+      {text:"Help people identify what could be useful or promising about the change.", tag:"Find possibility", clue:"You may naturally look for constructive possibilities and help others regain positive momentum.", strengths:"Possible connections: Optimist"},
+      {text:"None of these feels natural to me.", tag:"No clear clue in this case", clue:"That is useful evidence too. This particular situation may not reveal much about your natural patterns, or your instinctive response may be something not listed here.", strengths:"No strength connection assigned—continue to the next case."}
+    ]
+  }
+];
+
+let current=0, selected=null, revealed=false, evidence=[];
+const title=document.getElementById('scenarioTitle');
+const text=document.getElementById('scenarioText');
+const choices=document.getElementById('choices');
+const next=document.getElementById('next');
+const reveal=document.getElementById('reveal');
+const clueTitle=document.getElementById('clueTitle');
+const clueText=document.getElementById('clueText');
+const status=document.getElementById('status');
+const caseLabel=document.getElementById('caseLabel');
+const progressBar=document.getElementById('progressBar');
+
+function render(){
+  const c=cases[current];
+  selected=null; revealed=false;
+  title.textContent=c.title; text.textContent=c.text;
+  caseLabel.textContent=`Evidence File ${String(current+1).padStart(2,'0')} / ${String(cases.length).padStart(2,'0')}`;
+  progressBar.style.width=`${((current+1)/cases.length)*100}%`;
+  reveal.classList.remove('show'); next.disabled=true; next.textContent='Examine this clue';
+  status.textContent='Select the response that feels most natural.';
+  choices.innerHTML='';
+  c.options.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.type='button'; b.className='choice';
+    b.innerHTML=`<span class="choice-letter">${String.fromCharCode(65+i)}</span><span>${o.text}</span>`;
+    b.addEventListener('click',()=>{
+      selected=i;
+      [...choices.children].forEach(x=>x.classList.remove('selected'));
+      b.classList.add('selected');
+      next.disabled=false;
+      status.textContent='Evidence selected. Ready to examine the clue.';
+    });
+    choices.appendChild(b);
+  });
+}
+
+next.addEventListener('click',()=>{
+  if(selected===null) return;
+  const o=cases[current].options[selected];
+  if(!revealed){
+    revealed=true;
+    clueTitle.textContent=o.tag;
+    clueText.innerHTML=`${o.clue}<br><br><strong>${o.strengths}</strong>`;
+    reveal.classList.add('show');
+    next.textContent=(o.tag==='No clear clue in this case')
+      ? (current===cases.length-1?'Close the case':'Proceed to next case')
+      : (current===cases.length-1?'Close the case':'File clue & continue');
+    status.textContent='Remember: this is a clue, not a diagnosis.';
+    return;
+  }
+  evidence[current]={caseTitle:cases[current].title,tag:o.tag,clue:o.clue,strengths:o.strengths};
+  if(current<cases.length-1){current++;render();window.scrollTo({top:document.getElementById('game').offsetTop-15,behavior:'smooth'});}
+  else finish();
+});
+
+function finish(){
+  const game=document.getElementById('game');
+  const file=document.getElementById('casefile');
+  const grid=document.getElementById('evidenceGrid');
+  grid.innerHTML='';
+  evidence.forEach((e,i)=>{
+    const d=document.createElement('div');d.className='evidence';
+    d.innerHTML=`<div class="case-label">Clue ${String(i+1).padStart(2,'0')}</div><strong>${e.tag}</strong><div>${e.clue}</div><div class="small" style="margin-top:7px">${e.strengths}</div>`;
+    grid.appendChild(d);
+  });
+  game.classList.add('hidden');file.classList.add('show');
+  file.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function restart(){
+  current=0; selected=null; revealed=false; evidence=[];
+  document.getElementById('notes').value='';
+  document.getElementById('casefile').classList.remove('show');
+  document.getElementById('game').classList.remove('hidden');
+  render();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+document.getElementById('restart').addEventListener('click',restart);
+document.getElementById('again').addEventListener('click',restart);
+render();
+</script>
+</body>
+</html>
